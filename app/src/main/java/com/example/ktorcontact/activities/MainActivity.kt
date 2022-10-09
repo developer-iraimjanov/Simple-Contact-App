@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
+import androidx.lifecycle.ViewModelProvider
 import com.example.ktorcontact.R
 import com.example.ktorcontact.adapters.RVContactsAdapter
 import com.example.ktorcontact.databinding.ActivityMainBinding
@@ -24,6 +25,7 @@ import com.example.ktorcontact.models.ContactRequest
 import com.example.ktorcontact.models.ContactResponse
 import com.example.ktorcontact.network.KtorService
 import com.example.ktorcontact.viewmodel.MyViewModel
+import com.example.ktorcontact.viewmodel.MyViewModelFactory
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -37,7 +39,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.swipeRefreshLayout.isEnabled = false
-        vm = MyViewModel(KtorService.create())
+
+        vm = ViewModelProvider(
+            this,
+            MyViewModelFactory(KtorService.create())
+        )[MyViewModel::class.java]
 
         binding.imageAdd.setOnClickListener {
             if (booleanAntiBagDialog) {
@@ -59,7 +65,11 @@ class MainActivity : AppCompatActivity() {
         vm.audResponse.observe(this) {
             binding.swipeRefreshLayout.isRefreshing = false
             Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-            dialog.cancel()
+            try {
+                dialog.cancel()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             if (!it.error) {
                 vm.getContacts(binding.swipeRefreshLayout)
             }

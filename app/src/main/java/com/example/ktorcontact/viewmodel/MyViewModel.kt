@@ -10,7 +10,7 @@ import com.example.ktorcontact.models.Response
 import com.example.ktorcontact.network.KtorService
 import kotlinx.coroutines.launch
 
-class MyViewModel (
+class MyViewModel(
     private val ktorService: KtorService
 ) : ViewModel() {
 
